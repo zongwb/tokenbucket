@@ -1,9 +1,9 @@
 package TokenBucket
 
 import (
+	"fmt"
 	"testing"
 	"time"
-	"fmt"
 )
 
 func TestTokenBucket(t *testing.T) {
@@ -12,10 +12,10 @@ func TestTokenBucket(t *testing.T) {
 	if token == nil {
 		t.Error("Failed to create token bucket")
 	}
-		
+
 	routine := func(name string) {
 		for {
-			e := token.GetToken()
+			e := token.GetToken(0)
 			if e == nil {
 				fmt.Printf("%s got token\n", name)
 			} else {
@@ -24,17 +24,17 @@ func TestTokenBucket(t *testing.T) {
 			}
 		}
 	}
-	
+
 	go routine("Thread 1")
 	go routine("Thread 2")
-	time.Sleep(2*time.Second)
-	newToken := NewTokenBucket(rate*2)
+	time.Sleep(2 * time.Second)
+	newToken := NewTokenBucket(rate * 2)
 	oldToken := token
 	token = newToken
 	fmt.Printf("Changing token, double the rate...")
 	oldToken.Stop()
-	time.Sleep(2*time.Second)
+	time.Sleep(2 * time.Second)
 	token.Stop()
 	fmt.Printf("Stopping...")
-	time.Sleep(1*time.Second)
+	time.Sleep(1 * time.Second)
 }

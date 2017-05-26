@@ -7,16 +7,20 @@ import (
 )
 
 var (
+	// ErrNoTokenAvailable means running out of tokens
 	ErrNoTokenAvailable = errors.New("Running out of tokens")
-	ErrNotInit          = errors.New("Uninitialized tokenbucket")
+	// ErrNotInit means uninitialized
+	ErrNotInit = errors.New("Uninitialized tokenbucket")
 )
 
+// RateLimiter is an interface for a rate limiter.
 type RateLimiter interface {
 	GetToken(timeout time.Duration) error
 	Rate() uint32
 	Stop() error
 }
 
+// TokenBucket implements RateLimiter interface.
 type TokenBucket struct {
 	limit  uint32
 	t      *time.Ticker
@@ -59,6 +63,7 @@ func (tb *TokenBucket) run() {
 	}
 }
 
+// Stop stops generating tokens. Any further call to GetToken will block.
 func (tb *TokenBucket) Stop() error {
 	if tb == nil {
 		return ErrNotInit
@@ -70,6 +75,7 @@ func (tb *TokenBucket) Stop() error {
 	return nil
 }
 
+// Rate returns the current rate in tokens per second.
 func (tb *TokenBucket) Rate() uint32 {
 	if tb == nil {
 		return 0
